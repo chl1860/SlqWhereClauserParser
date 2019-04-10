@@ -118,5 +118,44 @@ namespace DParser.test
 
             Assert.AreEqual(ast.Right.Right.Value, inNode.Right.Value);
         }
+
+        [TestMethod]
+        [Description("it tests split string by space")]
+        public void TSplitStringBySpace()
+        {
+            var str1 = "Abc and \"CDE\" AND \"mn\"";
+            var array = str1.Split(new char[] { ' ' });
+            string[] expected = new string[] { "Abc", "and", "\"CDE\"", "AND", "\"mn\"" };
+
+            array.ShouldDeepEqual(expected);
+        }
+
+
+        [TestMethod]
+        [Description("It tests merged array method")]
+        public void TGetMergedArray()
+        {
+            var str = "A and b and '(c, d, e)'";
+            var str1 = "FUNC_CODE = 'aA'";
+            var str2 = "(FUNC_CODE = 'aA')";
+
+            var lexer = new Lexer(str);
+            var lexer1 = new Lexer(str1);
+            var lexer2 = new Lexer(str2);
+
+            var result1 = lexer.GetMergedArray(str);
+            var result2 = lexer1.GetMergedArray(str1);
+            var result3 = lexer2.GetMergedArray(str2);
+
+            var expected1 = new string[] { "A", "and", "b", "and", "'(c, d, e)'" };
+            var expected2 = new string[] { "FUNC_CODE", "=", "'aA'" };
+
+
+            result1.ShouldDeepEqual(expected1);
+            result2.ShouldDeepEqual(expected2);
+            result3.ShouldDeepEqual(expected2);
+
+        }
+
     }
 }

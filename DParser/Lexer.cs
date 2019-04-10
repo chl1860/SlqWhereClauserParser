@@ -6,19 +6,17 @@ namespace DParser
 {
     public class Lexer
     {
-        List<string> tokenArray = null;
+        string sqlStr = null;
         Util util = null;
-        Tokenizer tokenizer = null;
         public Lexer(string str)
         {
-            tokenizer = new Tokenizer();
-            tokenArray = tokenizer.GetMergedArray(str);
+            sqlStr = str;
             util = new Util();
         }
 
         public List<string> TokenArray
         {
-            get { return this.tokenArray; }
+            get { return this.GetMergedArray(this.sqlStr); }
         }
 
         public ASTNode GenerateAstNode(List<ASTNode> nodeList)
@@ -112,7 +110,7 @@ namespace DParser
                     {
                         var lastItem = list.LastOrDefault();
                         if (lastItem == null ||!(lastItem.Type == "MathExpr" && new Regex(@"\bin\b", RegexOptions.IgnoreCase).IsMatch(lastItem.Value))) {
-                            list.AddRange(GenerateNodeList(tokenizer.GetMergedArray(o)));
+                            list.AddRange(GenerateNodeList(this.GetMergedArray(o)));
                             list.Reverse();
                         }
                         else
@@ -133,8 +131,45 @@ namespace DParser
 
         public ASTNode GenerateAST()
         {
-            var nodeListist = GenerateNodeList(this.tokenArray);
+            var nodeListist = GenerateNodeList(this.GetMergedArray(this.sqlStr));
             return GenerateAstNode(nodeListist);
         }
+
+        public List<string> GetMergedArray(string str)
+        {
+            var array = str.Split(new char[] { ' ' });
+            var len = array.Length;
+            List<string> result = new List<string>(array.Length);
+
+            int i = 0, j = i - 1;
+            while (i < len && j < len)
+            {
+                if (j != -1 && result[j] != null && !util.IsFullString(result[j]))
+                {
+                    do
+                    {
+                        result[j] = string.Format("{0} {1}", result[j], array[i]);
+                        i++;
+                    } while (!util.IsFullString(result[j]) && i < len);
+                }
+                else
+                {
+                    result.Add(array[i]);
+                    i++;
+                    j++;
+                }
+            }
+
+            result.ForEach(o => o.Trim());
+
+            //排除：(FUNC_CODE = 'aa') 这一类的情况
+            if (!string.IsNullOrEmpty(str) && result[0] == str)
+            {
+                str = (new Regex(@"\(([^\)]+)\)")).Replace(str, "$1");
+                return GetMergedArray(str);
+            }
+            return result;
+        }
+
     }
 }

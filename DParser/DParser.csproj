@@ -58,7 +58,6 @@
     <Compile Include="ParserResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleStack.cs" />
-    <Compile Include="Token.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup />
