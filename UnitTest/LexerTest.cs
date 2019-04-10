@@ -1,0 +1,122 @@
+﻿using DeepEqual.Syntax;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+
+namespace DParser.test
+{
+    [TestClass]
+    public class LexerTest
+    {
+        [TestMethod]
+        [Description("it tests generate node list methods")]
+        public void TGenerateNodeList()
+        {
+            var sqlStr = "FUNC_CODE = 'AAA' AND REGION_CODE = 'abc'";
+
+            var lexer = new Lexer(sqlStr);
+            var nodeList = lexer.GenerateNodeList(lexer.TokenArray);
+            var funcNode = new ASTNode("Literal", "FUNC_CODE", null, null, null);
+            var funcEqNode = new ASTNode("MathExpr", "=", null, null, null);
+            var funcValNode = new ASTNode("Literal", "'AAA'", null, null, null);
+            var logicNode = new ASTNode("LogicalExpr", "AND", null, null, null);
+            var regNode = new ASTNode("Literal", "REGION_CODE", null, null, null);
+            var regEqNode = new ASTNode("MathExpr", "=", null, null, null);
+            var reqValNode = new ASTNode("Literal", "'abc'", null, null, null);
+
+            var expected = new List<ASTNode>
+            {
+                funcNode, funcEqNode, funcValNode, logicNode, regNode, regEqNode, reqValNode
+            };
+
+            nodeList.ShouldDeepEqual(expected);
+        }
+
+        [TestMethod]
+        [Description("it tests generate ast node by node array with single node")]
+        public void TGenerateSingleASTNode()
+        {
+            var lexer = new Lexer("");
+            var funcNode = new ASTNode("Literal", "FUNC_CODE", null, null, null);
+            var nodeList = new List<ASTNode> { funcNode };
+
+            var ast = lexer.GenerateAstNode(nodeList);
+            ast.ShouldDeepEqual(nodeList[0]);
+        }
+
+        [TestMethod]
+        public void TestGenerateEmptyAstNode()
+        {
+            var nodeList = new List<ASTNode>();
+            var lexer = new Lexer("");
+
+            var ast = lexer.GenerateAstNode(nodeList);
+            Assert.AreEqual(null, ast);
+        }
+
+        [TestMethod]
+        [Description("it tests  generate ast node methods")]
+        public void TGenerateAstNodeMethod()
+        {
+            var str1 = "FUNC_CODE = 'AAA'";
+            var lexer = new Lexer(str1);
+            var nodeListist = lexer.GenerateNodeList(lexer.TokenArray);
+            var ast = lexer.GenerateAstNode(nodeListist);
+
+            var funcNode = new ASTNode("Literal", "FUNC_CODE", null, null, null);
+            var funcEqNode = new ASTNode("MathExpr", "=", null, null, null);
+            var funcValNode = new ASTNode("Literal", "'AAA'", null, null, null);
+            funcEqNode.Left = funcNode;
+            funcEqNode.Right = funcValNode;
+            funcNode.Parent = funcEqNode;
+            funcValNode.Parent = funcEqNode;
+
+            Assert.AreEqual(funcEqNode.Left.Value, ast.Left.Value);
+            Assert.AreEqual(funcEqNode.Right.Value, ast.Right.Value);
+        }
+
+        [TestMethod]
+        public void TGenerateAstNodeMethodWithLogicKeyWords()
+        {
+            var str2 = "FUNC_CODE = 'BB' AND REGION_CODE = 'CC' OR TT IN ('MMMM', 'NNN')";
+            var lexer = new Lexer(str2);
+            var ast = lexer.GenerateAST();
+
+            var funcNode = new ASTNode("Literal", "FUNC_CODE", null, null, null);
+            var funcEqNode = new ASTNode("MathExpr", "=", null, null, null);
+            var funcValNode = new ASTNode("Literal", "'BB'", null, null, null);
+            funcEqNode.Left = funcNode;
+            funcEqNode.Right = funcValNode;
+            funcNode.Parent = funcEqNode;
+            funcValNode.Parent = funcEqNode;
+
+            var regNode = new ASTNode("Literal", "REGION_CODE", null, null, null);
+            var regEqNode = new ASTNode("MathExpr", "=", null, null, null);
+            var regValNode = new ASTNode("Literal", "'CC'", null, null, null);
+            regEqNode.Left = regNode;
+            regEqNode.Right = regValNode;
+            regNode.Parent = regEqNode;
+            regValNode.Parent = regEqNode;
+
+            var andNode = new ASTNode("LogicalExpr", "AND", funcEqNode, regEqNode, null);
+            funcEqNode.Parent = andNode;
+            regEqNode.Parent = andNode;
+
+            var inFieldNode = new ASTNode("Literal", "TT", null, null, null);
+            var inValNode = new ASTNode("Literal", "('MMMM', 'NNN')", null, null, null);
+            var inNode = new ASTNode("MathExpr", "IN", null, null, null);
+            var orNode = new ASTNode("LogicalExpr", "OR", null, null, null);
+            orNode.Left = andNode;
+            orNode.Right = inNode;
+            andNode.Parent = orNode;
+
+            inNode.Parent = orNode;
+            inNode.Left = inFieldNode;
+            inFieldNode.Parent = inNode;
+
+            inNode.Right = inValNode;
+            inValNode.Parent = inNode;
+
+            Assert.AreEqual(ast.Right.Right.Value, inNode.Right.Value);
+        }
+    }
+}
