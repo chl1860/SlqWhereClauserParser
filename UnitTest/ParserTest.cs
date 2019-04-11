@@ -1,5 +1,5 @@
-﻿using Core.Models;
-using DeepEqual.Syntax;
+﻿using DeepEqual.Syntax;
+using DParser.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 

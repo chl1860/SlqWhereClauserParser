@@ -1,4 +1,4 @@
-﻿using Core.Models;
+﻿using DParser.Models;
 
 namespace DParser
 {

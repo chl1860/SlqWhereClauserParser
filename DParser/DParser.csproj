@@ -34,9 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Core">
-      <HintPath>..\..\..\..\Downloads\A_MyJob\Opportunity to Engagement\500 UAT\Branch\v2.10.0\O2E_Application\O2E_Application\bin\Core.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -54,9 +51,12 @@
     <Compile Include="ASTNode.cs" />
     <Compile Include="ClsExtension.cs" />
     <Compile Include="Lexer.cs" />
+    <Compile Include="Models\Filter.cs" />
+    <Compile Include="Models\SearchFilter.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="ParserResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SearchFlag.cs" />
     <Compile Include="SimpleStack.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
